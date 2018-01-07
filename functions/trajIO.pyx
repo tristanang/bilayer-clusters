@@ -2,6 +2,7 @@ import numpy as np
 cimport numpy as np
 
 import boundary as bound
+import constants as c
 
 import re
 
@@ -14,7 +15,7 @@ def cholConc(filename):
             file.close()
             return int(line[1]) * 2
 
-cdef processTrajCOM(str trajFileName,int Nchol,int NDIM,int Nconf):
+def processTrajCOM(str trajFileName,int Nchol,int NDIM,int Nconf):
     trajFile = open(trajFileName,'r')
     cdef int N = int(trajFile.readline().split()[0])
     cdef int Nperlipid = c.Nperlipid
@@ -93,3 +94,46 @@ cdef processTrajCOM(str trajFileName,int Nchol,int NDIM,int Nconf):
     trajFile.close()
 
     return N,L,com_lipids,com_chol
+
+def translateZ(np.ndarray[np.double_t, ndim=3] x,np.ndarray[np.double_t, ndim=3] y):
+    cdef int Nconf,Nlipidbeads,Ncholbeads,N
+    cdef double z_avg
+    cdef int t,i
+    
+    Nconf = len(x[0][0])
+    Nlipidbeads = len(x)
+    Ncholbeads = len(y)
+    N = Nlipidbeads + Ncholbeads
+
+    for t in range(Nconf):
+        z_avg = 0.
+            
+        for i in range(Nlipidbeads):
+            z_avg += x[i,2,t]
+
+        for i in range(Ncholbeads):
+            z_avg += y[i,2,t]
+
+        z_avg = z_avg / N
+
+        for i in range(Nlipidbeads):
+            x[i,2,t] -= z_avg
+
+        for i in range(Ncholbeads):
+            y[i,2,t] -= z_avg
+
+    return x,y
+
+def layering(np.ndarray[np.double_t, ndim=3] x):
+	z = c.NDIM - 1
+	lower = []
+	upper = []
+	output = [lower,upper]
+	print("unfinished code")
+
+	return output
+
+import json
+
+def jsondecode():
+    pass
