@@ -45,7 +45,7 @@ def processTrajCOM(str trajFileName,int Nchol,int NDIM,int Nconf):
         
         #Box Sizes
         for k in range(NDIM):
-            L[k,t] = float(trajFile.readline().strip())
+            L[t,k] = float(trajFile.readline().strip())
         
         #Bead Coordinates
         for i in range(Nlipidbeads//2):
