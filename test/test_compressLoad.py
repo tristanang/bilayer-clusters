@@ -23,6 +23,8 @@ if __name__ == "__main__":
     #print(numpy.array_equal(com_lipids,lipids_new))
     #print(numpy.array_equal(com_chol,chol_new))
 
+    print(lipids_new.shape)
+
     if numpy.array_equal(L,L_new) and numpy.array_equal(com_lipids,lipids_new) and numpy.array_equal(com_chol,chol_new):
         print("compressLoad test passed")
     else:

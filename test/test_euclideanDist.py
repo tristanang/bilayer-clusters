@@ -1,3 +1,6 @@
+import sys
+sys.path.append("../")
+
 from bilayer_clusters import trajIO
 from bilayer_clusters.euclideanDist import *
 
@@ -23,23 +26,22 @@ def test_no_z_dist():
         return False
 
 def test_2vs0_loop():
-    Nconf = 100
     N = 23
     N2 = 43
     NDIM = 3
-    p1 = np.random.rand(Nconf,N,NDIM)
-    p2 = np.random.rand(Nconf,N2,NDIM)
+    p1 = np.random.rand(N,NDIM)
+    p2 = np.random.rand(N2,NDIM)
 
     dist1 = edm_two_loop(p1,p2)
     dist2 = edm(p1,p2)
 
     sum = 0.0
 
-    for t in range(Nconf):
-        difference = np.linalg.norm(dist1[t] - dist2[t], ord='fro')
+    for t in range(1):
+        difference = np.linalg.norm(dist1 - dist2, ord='fro')
         sum += difference
 
-    if sum < 1:
+    if sum < 0.00000001:
         print(str(sum)+" 2loop vs 0 loop passed")
         return True
     else:

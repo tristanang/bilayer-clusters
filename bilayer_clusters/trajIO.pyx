@@ -100,9 +100,9 @@ def translateZ(np.ndarray[np.double_t, ndim=3] x,np.ndarray[np.double_t, ndim=3]
     cdef double z_avg
     cdef int t,i
     
-    Nconf = len(x[0][0])
-    Nlipidbeads = len(x)
-    Ncholbeads = len(y)
+    Nconf = x.shape[0]
+    Nlipidbeads = x.shape[1]
+    Ncholbeads = y.shape[1]
     N = Nlipidbeads + Ncholbeads
 
     for t in range(Nconf):
@@ -123,14 +123,6 @@ def translateZ(np.ndarray[np.double_t, ndim=3] x,np.ndarray[np.double_t, ndim=3]
             y[t,i,2] -= z_avg
 
     return x,y
-
-def layering(np.ndarray[np.double_t, ndim=3] x):
-    z = c.NDIM - 1
-    lower = []
-    upper = []
-    output = [lower,upper]
-
-    return output
 
 def decompress(file="comTraj.npz"):
     npzfile = np.load(file)
