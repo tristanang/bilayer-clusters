@@ -1,6 +1,7 @@
-import trajIO
+from bilayer_clusters import trajIO
+from bilayer_clusters import constants as c
 import sys
-import constants as c
+
 
 def spitnumpy(trajFileName, topology, Nconf):
     outfile = "comTraj"
@@ -15,5 +16,3 @@ if __name__ == "__main__":
     topology = sys.argv[3]
 
     spitnumpy(trajFileName, topology, Nconf)
-
-    #print json to file
