@@ -4,8 +4,8 @@ import numpy as np
 from bilayer_clusters import trajIO
 from bilayer_clusters import constants as c
 
-def gr(com_lipids,com_chol,edm):
-    pass
+def gr(com_lipids,com_chol,Nconf,edm):
+    
 
 if __name__ == "__main__":
     if len(sys.argv) != 4 and len(sys.argv) != 5:
