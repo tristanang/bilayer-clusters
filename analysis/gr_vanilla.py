@@ -6,8 +6,11 @@ from bilayer_clusters import constants as c
 from bilayer_clusters import euclideanDist
 
 def gr(L,shape,matrix1,matrix2=None,edm=euclideanDist.edm):
+    flag = False
+
     if not np.any(matrix2):
         matrix2 = matrix1
+        flag = True
 
     gr = np.zeros(shape,int)
 
@@ -21,7 +24,21 @@ def gr(L,shape,matrix1,matrix2=None,edm=euclideanDist.edm):
     for k,v in hsh.items():
         gr[k] += v
 
+    if flag:
+        gr[0] -= matrix1.shape[0]
+
     return gr
+
+def norm(L,lipid_pair,cross_pair=None):
+    L_ave = [np.mean(L[:,0]),np.mean(L[:,1])]
+    
+    lipid_norm = lipid_pair * np.pi * c.DR / 2.
+    lipid_norm = L_ave[0]*L_ave[1]/(4*lipid_norm)
+    
+    cross_norm = cross_pair * np.pi * c.DR /2.
+    cross_norm = L_ave[0]*L_ave[1]/(4*cross_norm)
+
+    return lipid_norm,cross_norm
 
 if __name__ == "__main__":
     if len(sys.argv) != 4 and len(sys.argv) != 5:
@@ -54,23 +71,17 @@ if __name__ == "__main__":
 
     for t in range(Nconf):
         if t%nlog == 0:
-            upper_lipids = com_lipids[t][com_lipids[t][:,2]>=0] 
-            lower_lipids = com_lipids[t][com_lipids[t][:,2]<0]
+            upper_lipids, lower_lipids = trajIO.layering(com_lipids[t])
 
-            upper_chol = com_chol[t][com_chol[t][:,2]>=0] 
-            lower_chol = com_chol[t][com_chol[t][:,2]<0]
+            upper_chol, lower_chol = trajIO.layering(com_chol[t])
 
-            ulc = upper_lipids.shape[0] #upper lipids count
-            llc = lower_lipids.shape[0]
+            ulc, llc = upper_lipids.shape[0], lower_lipids.shape[0]
 
-            ucc = upper_chol.shape[0]
-            lcc = lower_chol.shape[0]
+            ucc, lcc = upper_chol.shape[0], lower_chol.shape[0]
 
             #lipid
             lipid_gr += gr(L[t],lipid_gr.shape,upper_lipids)
             lipid_gr += gr(L[t],lipid_gr.shape,lower_lipids)
-            lipid_gr[0] -= ulc
-            lipid_gr[0] -= llc
 
             lipid_pair += ulc*ulc - ulc
             lipid_pair += llc*llc - llc
@@ -82,13 +93,7 @@ if __name__ == "__main__":
             cross_pair += ulc*ucc
             cross_pair += llc*lcc
 
-    L_ave = [np.mean(L[:,0]),np.mean(L[:,1])]
-    
-    lipid_norm = lipid_pair * np.pi * c.DR / 2.
-    lipid_norm = L_ave[0]*L_ave[1]/(4*lipid_norm)
-    
-    cross_norm = cross_pair * np.pi * c.DR /2.
-    cross_norm = L_ave[0]*L_ave[1]/(4*cross_norm)
+    lipid_norm,cross_norm = norm(L,lipid_pair,cross_pair)
 
     lipidFile = open("gr-com-lipids.dat",'w')
 

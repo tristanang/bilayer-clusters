@@ -124,6 +124,12 @@ def translateZ(np.ndarray[np.double_t, ndim=3] x,np.ndarray[np.double_t, ndim=3]
 
     return x,y
 
+def layering(com_lipids):
+    upper_lipids = com_lipids[com_lipids[:,2]>=0] 
+    lower_lipids = com_lipids[com_lipids[:,2]<0]
+
+    return upper_lipids,lower_lipids
+
 def decompress(file="comTraj.npz"):
     npzfile = np.load(file)
 
