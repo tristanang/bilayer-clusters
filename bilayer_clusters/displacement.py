@@ -14,22 +14,20 @@ def block_displacement(L,lipids): #get displacement of every timestep with refer
     output_lipids = np.zeros([Nconf,Nlipids,NDIM+1])
     output_lipids[:,:,:3] = lipids
 
-    lipids = lipids[:,:,:2]
+    lipids = lipids[:,:,:2] #lipids.shape is 
+    displacement = np.zeros([Nconf,Nlipids,NDIM-1])
 
     for t in range(Nconf):
         if t%c.nlog == 0:
             frontblock = t
-            displacement = lipids[frontblock:frontblock+c.nlog,:,:] - lipids[frontblock,:,:]
-            
-            for dt in range(c.nlog):
-                for k in range(NDIM-1):
-                    displacement[dt,:,k] = v_periodic(displacement[dt,:,k],L[t,k])
-
-            displacement = displacement**2
-            output_lipids[frontblock:frontblock+c.nlog,:,3] = np.sqrt(displacement[:,:,0] + displacement[:,:,1])
-
+            displacement[frontblock:frontblock+c.nlog,:,:] = lipids[frontblock:frontblock+c.nlog,:,:] - lipids[frontblock,:,:]
+        
         else:
-            continue    
+            for k in range(NDIM-1):
+                displacement[t,:,k] = v_periodic(displacement[t,:,k],L[t,k])
+
+    displacement = displacement**2
+    output_lipids[:,:,3] = np.sqrt(displacement[:,:,0]+displacement[:,:,1])
 
     return output_lipids
 

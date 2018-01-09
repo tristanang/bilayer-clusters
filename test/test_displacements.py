@@ -3,7 +3,37 @@ import sys
 from bilayer_clusters import trajIO,displacement
 import numpy as np 
 
-def vs02loop():
+def time_function(f, *args):
+    """
+    Call a function f with args and return the time (in seconds) that it took to execute.
+    """
+    import time
+    tic = time.time()
+    f(*args)
+    toc = time.time()
+    return toc - tic
+
+def vs1_2loop():
+    file = "comTraj.npz"
+    L,com_lipids,com_chol = trajIO.decompress(file)
+
+    noloop = displacement.block_displacement_one(L,com_lipids)
+    twoloop = displacement.block_displacement_loop(L,com_lipids)
+
+    sum = 0.0
+
+    for t in range(100):
+        difference = np.linalg.norm(noloop[t] - twoloop[t], ord='fro')
+        sum += difference
+
+    if sum < 0.00000001:
+        print(str(sum)+" 2loop vs 1 loop passed")
+        return True
+    else:
+        print(str(sum)+" 2loop vs 1 loop failed")
+        return False
+
+def vs0_2loop():
     file = "comTraj.npz"
     L,com_lipids,com_chol = trajIO.decompress(file)
 
@@ -12,7 +42,7 @@ def vs02loop():
 
     sum = 0.0
 
-    for t in range(52):
+    for t in range(100):
         difference = np.linalg.norm(noloop[t] - twoloop[t], ord='fro')
         sum += difference
 
@@ -23,5 +53,22 @@ def vs02loop():
         print(str(sum)+" 2loop vs 0 loop failed")
         return False
 
+def timings():
+    file = "comTraj.npz"
+    L,com_lipids,com_chol = trajIO.decompress(file)
+
+    two_loop_time = time_function(displacement.block_displacement_loop, L,com_lipids)
+    print('Two loop version took %f seconds' % two_loop_time)
+
+    one_loop_time = time_function(displacement.block_displacement_one, L,com_lipids)
+    print('One loop version took %f seconds' % one_loop_time)
+
+    no_loop_time = time_function(displacement.block_displacement, L,com_lipids)
+    print('No loop version took %f seconds' % no_loop_time)
+
 if __name__ == "__main__":
-    vs02loop()
+    vs1_2loop()
+    vs0_2loop()
+    #speed benchmark
+
+    timings()
