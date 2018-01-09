@@ -52,6 +52,7 @@ def edm(L,matrix1, matrix2=None): #Euclidean distance matrix
     lst = [0,0]
     dists = np.zeros([Nlipids,Nchol])
 
+    #v_periodic = bound.periodic
     v_periodic = np.vectorize(bound.periodic)
 
     for k in range(NDIM-1):
