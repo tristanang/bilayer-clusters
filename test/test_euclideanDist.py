@@ -6,7 +6,7 @@ from bilayer_clusters.euclideanDist import *
 
 import numpy as np
 import random
-
+"""
 def test_no_z_dist():
     p1 = np.random.rand(3)
     p2 = np.random.rand(3)
@@ -24,16 +24,18 @@ def test_no_z_dist():
     else:
         print("no_z_dist function failed")
         return False
-
+"""
 def test_2vs0_loop():
     N = 23
     N2 = 43
     NDIM = 3
+    L = [1,1,1]
+
     p1 = np.random.rand(N,NDIM)
     p2 = np.random.rand(N2,NDIM)
 
-    dist1 = edm_two_loop(p1,p2)
-    dist2 = edm(p1,p2)
+    dist1 = edm_two_loop(L,p1,p2)
+    dist2 = edm(L,p1,p2)
 
     sum = 0.0
 

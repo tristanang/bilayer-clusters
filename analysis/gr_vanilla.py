@@ -5,13 +5,13 @@ from bilayer_clusters import trajIO
 from bilayer_clusters import constants as c
 from bilayer_clusters import euclideanDist
 
-def gr(shape,matrix1,matrix2=None,edm=euclideanDist.edm):
+def gr(L,shape,matrix1,matrix2=None,edm=euclideanDist.edm):
     if not np.any(matrix2):
         matrix2 = matrix1
 
     gr = np.zeros(shape,int)
 
-    dists = edm(matrix1,matrix2)
+    dists = edm(L,matrix1,matrix2)
     dists = dists//c.DR
     dists = dists.astype(int)
 
@@ -46,8 +46,8 @@ if __name__ == "__main__":
 
     ##data arrays
 
-    lipid_gr = np.zeros([int(2*L[0][0]/c.DR)],int)
-    cross_gr =  np.zeros([int(2*L[0][0]/c.DR)],int)
+    lipid_gr = np.zeros([int(L[0][0]/c.DR)],int)
+    cross_gr =  np.zeros([int(L[0][0]/c.DR)],int)
     
     lipid_pair = 0
     cross_pair = 0
@@ -58,17 +58,17 @@ if __name__ == "__main__":
             lower_lipids = com_lipids[t][com_lipids[t][:,2]<0]
 
             upper_chol = com_chol[t][com_chol[t][:,2]>=0] 
-            lower_chol = com_chol[t][com_chol[t][:,2]>=0]
+            lower_chol = com_chol[t][com_chol[t][:,2]<0]
 
             ulc = upper_lipids.shape[0] #upper lipids count
             llc = lower_lipids.shape[0]
 
             ucc = upper_chol.shape[0]
-            lcc = lower_lipids.shape[0]
+            lcc = lower_chol.shape[0]
 
             #lipid
-            lipid_gr += gr(lipid_gr.shape,upper_lipids)
-            lipid_gr += gr(lipid_gr.shape,lower_lipids)
+            lipid_gr += gr(L[t],lipid_gr.shape,upper_lipids)
+            lipid_gr += gr(L[t],lipid_gr.shape,lower_lipids)
             lipid_gr[0] -= ulc
             lipid_gr[0] -= llc
 
@@ -76,8 +76,8 @@ if __name__ == "__main__":
             lipid_pair += llc*llc - llc
 
             #cross
-            cross_gr += gr(cross_gr.shape,upper_lipids,upper_chol)
-            cross_gr += gr(cross_gr.shape,lower_lipids,lower_chol)
+            cross_gr += gr(L[t],cross_gr.shape,upper_lipids,upper_chol)
+            cross_gr += gr(L[t],cross_gr.shape,lower_lipids,lower_chol)
 
             cross_pair += ulc*ucc
             cross_pair += llc*lcc
@@ -92,13 +92,13 @@ if __name__ == "__main__":
 
     lipidFile = open("gr-com-lipids.dat",'w')
 
-    for step in range(len(lipid_gr)//4):
+    for step in range(len(lipid_gr)//2):
         lipidFile.write(str((step+0.5)*c.DR)+" "+str(lipid_norm*lipid_gr[step]/((step+0.5)*c.DR))+"\n")
     lipidFile.close()
 
     cholFile = open("gr-com-cross.dat",'w')
 
-    for step in range(len(cross_gr)//4):
+    for step in range(len(cross_gr)//2):
         cholFile.write(str((step+0.5)*c.DR)+" "+str(cross_norm*cross_gr[step]/((step+0.5)*c.DR))+"\n")       
     cholFile.close()
 

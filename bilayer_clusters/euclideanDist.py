@@ -1,7 +1,9 @@
 import numpy as np
+from bilayer_clusters import boundary as bound
 
 from scipy.spatial.distance import cdist as euclidean_distances
 
+"""
 def no_z_dist(p1,p2):
     p1[2] = p2[2] = 0
 
@@ -15,8 +17,8 @@ def no_z_xy(p1,p2):
     p1[:,2] = 0 
     p2[:,2] = 0
     return np.dot(p1, p2.T)
-
-def edm_two_loop(matrix1, matrix2=None): #Euclidean distance matrix
+"""
+def edm_two_loop(L,matrix1, matrix2=None): #Euclidean distance matrix #L array of 3 dimensions
     Nlipids = matrix1.shape[0]
 
     if not np.any(matrix2):
@@ -25,16 +27,20 @@ def edm_two_loop(matrix1, matrix2=None): #Euclidean distance matrix
     Nchol = matrix2.shape[0]
 
     dists = np.zeros([Nlipids,Nchol])
+    r = [0,0]
 
     for i in range(Nlipids):
         for j in range(Nchol):
+            for k in range(2):
+                r[k] = matrix1[i][k] - matrix2[j][k]
+                r[k] = bound.periodic(r[k],L[k])
 
-            squared_dist = no_z_dist(matrix1[i],matrix2[j])
-            dists[i,j] = np.sqrt(squared_dist)
+            r2 = np.sqrt(r[0]*r[0] + r[1]*r[1])
+            dists[i,j] = r2
     
     return dists
 
-def edm(matrix1, matrix2=None): #Euclidean distance matrix
+def edm(L,matrix1, matrix2=None): #Euclidean distance matrix
     Nlipids = matrix1.shape[0]
 
     if not np.any(matrix2):
@@ -42,13 +48,22 @@ def edm(matrix1, matrix2=None): #Euclidean distance matrix
 
     Nchol = matrix2.shape[0]
 
+    NDIM = 3
+    lst = [0,0]
     dists = np.zeros([Nlipids,Nchol])
 
-    matrix1[:,2] = 0
-    matrix2[:,2] = 0
+    v_periodic = np.vectorize(bound.periodic)
 
+    for k in range(NDIM-1):
+        matrix_1 = matrix1[:,k].reshape(-1,1)
+        matrix_2 = matrix2[:,k].reshape(-1,1)
+        dist1d = euclidean_distances(matrix_1,matrix_2,'euclidean')
+        dist1d = v_periodic(dist1d,L[k])
+        lst[k] = dist1d
 
-    dists = euclidean_distances(matrix1,matrix2,'euclidean')
+    dists = np.sqrt(lst[0]**2 + lst[1]**2)
+
+    #dists = euclidean_distances(matrix1,matrix2,'euclidean')
 
     """
     x_squared = no_z_squared(matrix1[t])
