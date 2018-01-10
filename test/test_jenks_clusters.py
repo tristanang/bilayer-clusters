@@ -1,12 +1,10 @@
 import json
-from bilayer_clusters import jenks
+from bilayer_clusters import jenks_clusters
 
 def test_json():
-    data = json.load(open('jenks.json'))
-    data.sort()
-
-    breaks = jenks.jenks(data, 5)
-    breaks = list(map(lambda x : data[x],breaks))
+    data = json.load(open('test.json'))
+    clusters = jenks_clusters.clusters_base(data,5)
+    breaks = list(map(lambda x : breaks[x],breaks))
 
     assert [round(v, 6) for v in breaks] == [0.002811,
                                              2.093548,
@@ -16,5 +14,5 @@ def test_json():
                                              9.997983]
 
 if __name__ == '__main__':
-    test_json()
+    test_json
     print("passed")
