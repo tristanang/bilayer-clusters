@@ -1,7 +1,9 @@
 from jenks import jenks
+import numpy as np
+
 def goodness_of_variance_fit(array, classes):
     # get the break points
-    classes = jenks(array, classes)
+    breaks = jenks(array, classes)
 
     # do the actual classification
     classified = np.array([classify(i, classes) for i in array])

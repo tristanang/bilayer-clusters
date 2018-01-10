@@ -2,6 +2,9 @@ import numpy as np
 cimport numpy as np
 cimport cython
 
+#original code taken from https://github.com/perrygeo/jenks
+#edits made to make code return natural breaks in terms of indices
+
 # "ctypedef" assigns a corresponding compile-time type to DTYPE_t. For
 # every type in the numpy module there's a corresponding compile-time
 # type with a _t-suffix.
@@ -90,20 +93,19 @@ def jenks(data, n_classes):
         return
 
     data = np.array(data, dtype=DTYPE)
-    data.sort()
 
     lower_class_limits, _ = jenks_matrices(data, n_classes)
 
     k = data.shape[0] - 1
-    kclass = [0.] * (n_classes+1)
+    kclass = [0] * (n_classes+1)
     countNum = n_classes
 
-    kclass[n_classes] = data[len(data) - 1]
-    kclass[0] = data[0]
+    kclass[n_classes] = len(data) - 1
+    kclass[0] = 0
 
     while countNum > 1:
         elt = int(lower_class_limits[k][countNum] - 2)
-        kclass[countNum - 1] = data[elt]
+        kclass[countNum - 1] = elt
         k = int(lower_class_limits[k][countNum] - 1)
         countNum -= 1
 
