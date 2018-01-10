@@ -1,48 +1,25 @@
-from jenks import jenks
-from bisect import bisect_left
+from bilayer_clusters import jenks
 import numpy as np
-
-def index(a, x):
-    'Locate the leftmost value exactly equal to x'
-    i = bisect_left(a, x)
-    if i != len(a) and a[i] == x:
-        return i
-    raise ValueError
-
-def binary_search(arr,x,lo=0,hi=None):
-    if not hi:
-        hi = len(arr)
-
-    found = False
-
-    while lo<=hi and not found:
-        mid = (lo + hi)//2
-        if arr[mid] == x:
-            return mid
-        elif arr[mid]>x:
-            hi = mid-1
-        elif arr[mid]<x:
-            lo = mid+1
-        else:
-            raise ValueError
-
-    return ValueError
 
 def clusters_base(arr,k): #array is pre-sorted
-    breaks = jenks(arr,k)
-    print(breaks)
-    clusters = []
+    breaks = jenks.jenks(arr,k)
+    clusters = [0 for i in range(k)]
 
-    breaks = list(map(lambda x : binary_search(breaks,x),breaks))
+    i_start = 0
+    i = 0
 
-    return(breaks)
+    for index in breaks[1:-1]:
+        i_end = index
+        clusters[i] = arr[i_start:i_end+1]
+        i += 1
+        i_start = i_end+1
 
-import numpy as np
-arr = [1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,100.0]
-arr.sort()
-print(arr)
-print(clusters_base(arr,3))
+    clusters[i] = arr[i_start:]
 
+    return clusters
+
+def clusters(lipids,k,t):
+    return
 
 def clusterForm(group,interval,endblock):
     clusters = []
