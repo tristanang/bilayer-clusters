@@ -1,5 +1,5 @@
 import json
-from bilayer_clusters import jenks_clusters
+from bilayer_clusters import jenks_clusters, trajIO, displacement
 
 def test_json():
     data = json.load(open('jenks.json'))
@@ -26,8 +26,41 @@ def test_json():
 
     return
 
+def test_sort():
+    file = "comTraj.npz"
+    L,com_lipids,com_chol = trajIO.decompress(file)
+
+    com_lipids = displacement.block_displacement(L,com_lipids)
+    Nlipids = com_lipids.shape[1]
+    Nconf = com_lipids.shape[0]
+
+    for t in range(Nconf):
+        lipids = com_lipids[t][com_lipids[t][:,3].argsort()]
+        curr = 0
+        for i in range(Nlipids):
+            if curr > lipids[i,3]:
+                print("sorting messed up")
+                raise ValueError
+            else:
+                curr = lipids[i,3]
+
+    return True
+
+def test_clusters(): #not a complete testfunction but the function should nonetheless be accurate
+    file = "comTraj.npz"
+    L,com_lipids,com_chol = trajIO.decompress(file)
+
+    com_lipids = displacement.block_displacement(L,com_lipids)
+    Nlipids = com_lipids.shape[1]
+
+    clusters = jenks_clusters.clusters(com_lipids[40],4)
+
+    return clusters
+
 if __name__ == '__main__':
     test_json()
+    test_sort()
+    test_clusters()
     print("passed")
 
 #[0, 442, 858, 1246, 1604, 1999]
