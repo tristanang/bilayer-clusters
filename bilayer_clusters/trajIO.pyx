@@ -1,5 +1,6 @@
 import numpy as np
 cimport numpy as np
+cimport cython
 
 from bilayer_clusters import boundary as bound
 import constants as c

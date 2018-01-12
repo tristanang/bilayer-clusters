@@ -1,6 +1,28 @@
-from jenks import jenks
 import numpy as np
 
+def gvf(cluster):
+    cluster = list(map(lambda x: x[:,3],cluster))
+
+    return gvf_helper(cluster)
+
+def gvf_helper(cluster): #can parallelize for speed
+    Nlipids = sum(list(map(lambda x: x.shape[0],cluster)))
+    
+    pre_mean = sum(list(map(np.sum,cluster)))
+    global_mean = pre_mean/Nlipids
+    
+    class_means = list(map(np.mean,cluster))
+    
+    SDAM = list(map(lambda x : (x-global_mean)**2, cluster))
+    SDAM = sum(list(map(sum, SDAM)))
+
+    for i in range(len(cluster)):
+        cluster[i] = (cluster[i] - class_means[i])**2
+
+    SDCM = sum(list(map(np.sum, cluster))) 
+
+    return (SDAM-SDCM)/SDAM
+"""
 def goodness_of_variance_fit(array, classes):
     # get the break points
     breaks = jenks(array, classes)
@@ -33,3 +55,4 @@ def classify(value, breaks):
         if value < breaks[i]:
             return i
     return len(breaks) - 1
+"""
