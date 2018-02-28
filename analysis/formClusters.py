@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     for start in range(Nblock):
         for time in times:
-            t = start + time
+            t = start*nlog + time
 
             upper_lipids, lower_lipids = trajIO.layering(com_lipids[t])
             upper_chol, lower_chol = trajIO.layering(com_chol[t])
