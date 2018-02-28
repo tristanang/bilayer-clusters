@@ -1,0 +1,1 @@
+/*Lipid structures are one of the most ubiquitous forms of biological soft matter. Given their vital role in biological function, lipid structures have been subject to the instense study for many decades.*//*Lipid bilayers form membranes that surround all cells and many sub-cellular structures and are impermeable to nearly all water-solube molecules. */

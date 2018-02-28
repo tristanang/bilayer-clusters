@@ -29,10 +29,10 @@ def clusters(lipids,k): #removed t dependence
 
     for index in breaks[1:-1]:
         i_end = index
-        clusters[i] = lipids[i_start:i_end+1]
+        clusters[i] = np.asarray(lipids[i_start:i_end+1])
         i += 1
         i_start = i_end+1
 
-    clusters[i] = lipids[i_start:]
+    clusters[i] = np.asarray(lipids[i_start:])
 
     return clusters

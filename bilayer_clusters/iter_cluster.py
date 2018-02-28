@@ -3,7 +3,7 @@ from bilayer_clusters import euclideanDist
 from functools import reduce
 import matplotlib.pyplot as plt
 
-from scipy.spatial.distance import cdist as euclidean_distances
+#from scipy.spatial.distance import cdist as euclidean_distances
 
 def findCluster(clusters,item):
     Nclusters = len(clusters)
@@ -24,10 +24,12 @@ def display(cluster):
 
 class Cluster:
     def __init__(self,arr,L,cutoff):
+        self.L = L
+        self.cutoff = cutoff
         self.arr = arr
         self.Nparticles = len(arr)
-        #edm = euclideanDist.edm(L,arr)
-        edm = euclidean_distances(arr,arr,'euclidean')
+        edm = euclideanDist.edm(L,arr)
+        #edm = euclidean_distances(arr,arr,'euclidean')
         self.clusters = [set([i]) for i in range(self.Nparticles)]
 
         for i in range(self.Nparticles):
@@ -41,6 +43,8 @@ class Cluster:
             for index in indices:
                 self.clusters[small] |= self.clusters[index]
                 del self.clusters[index]
+
+        self.sizes = self.getSizes()
           
     def singletonMerge(self):
         singletons = list(filter(lambda x : len(x) == 1,self.clusters))
@@ -54,8 +58,29 @@ class Cluster:
     def getCenter(self):
         return
 
+    def normalize(self,original):
+        sizes = self.getSizes()
+
+        trials = 10
+        m = np.zeros(trials)
+        mS = np.zeros(trials)
+
+        for i in range(trials):
+            random_clust = randomCluster(self.Nparticles,original)
+            c = Cluster(random_clust,self.L,self.cutoff)
+            sizes = c.getSizes()
+            
+            m[i] = np.mean(sizes)
+
+            sizes = sizes ** 2
+            mS[i] = np.mean(sizes)
+
+        return (self.mean()/np.mean(m)),(self.weightedMean()/(np.mean(mS)/np.mean(m)))
+
     def getSizes(self):
-        output = list(map(lambda x: float(len(x))/self.Nparticles, self.clusters))
+        #output = list(map(lambda x: float(len(x))/self.Nparticles, self.clusters))
+        output = list(map(lambda x: len(x), self.clusters))
+        output = np.asarray(output)
 
         return output
 
@@ -71,6 +96,13 @@ class Cluster:
 
     def test(self):
         assert (sum(self.getSizes())-1) <= 0.0000001
+
+    def weightedMean(self):
+        arr = self.sizes ** 2
+        return np.mean(arr)/(self.mean())
+
+    def mean(self):
+        return np.mean(self.sizes)
 
 def randomCluster(siz,arr):
     Nparticles = len(arr)
