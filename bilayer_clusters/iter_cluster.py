@@ -24,7 +24,6 @@ def display(cluster):
 
 class Cluster:
     def __init__(self,arr,L,cutoff):
-        self.L = L
         self.cutoff = cutoff
         self.arr = arr
         self.Nparticles = len(arr)
@@ -58,10 +57,10 @@ class Cluster:
     def getCenter(self):
         return
 
-    def normalize(self,original):
+    def normalize(self,original,iterations=10):
         sizes = self.getSizes()
 
-        trials = 10
+        trials = iterations
         m = np.zeros(trials)
         mS = np.zeros(trials)
 
