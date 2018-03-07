@@ -53,7 +53,7 @@ def test_clusters(): #not a complete testfunction but the function should noneth
     com_lipids = displacement.block_displacement(L,com_lipids)
     Nlipids = com_lipids.shape[1]
 
-    clusters = jenks_clusters.clusters(com_lipids[40],4)
+    clusters = jenks_clusters.clusters(com_lipids[40],4,com_lipids[0])
 
     return clusters
 
