@@ -3,6 +3,9 @@ from bilayer_clusters import euclideanDist
 from functools import reduce
 import matplotlib.pyplot as plt
 
+import multiprocessing
+pool = multiprocessing.Pool()
+
 #from scipy.spatial.distance import cdist as euclidean_distances
 
 def findCluster(clusters,item):
@@ -61,10 +64,21 @@ class Cluster:
         return
 
     def normalize(self,original,trials=5):
+        def hidden_r(x):
+            random_clust = randomCluster(self.Nparticles,original)
+            c = Cluster(random_clust,self.L,self.cutoff)
+            return c.sizes 
 
-        m = np.zeros(trials)
-        mS = np.zeros(trials)
+        temp = [0 for i in range(trials)]
+        temp = list(map(hidden_r, temp))
 
+        m = pool.map(np.mean,temp)
+
+        temp = pool.map(np.square,temp)
+        mS = pool.map(np.mean,temp)
+
+        """
+        #parallelize
         for i in range(trials):
             random_clust = randomCluster(self.Nparticles,original)
             c = Cluster(random_clust,self.L,self.cutoff)
@@ -74,12 +88,15 @@ class Cluster:
 
             sizes = sizes ** 2
             mS[i] = np.mean(sizes)
+        """
 
         return (self.mean()/np.mean(m)),(self.weightedMean()/(np.mean(mS)/np.mean(m)))
 
+
+
     def getSizes(self):
         #output = list(map(lambda x: float(len(x))/self.Nparticles, self.clusters))
-        output = list(map(lambda x: len(x), self.clusters))
+        output = pool.map(len, self.clusters)
         output = np.asarray(output)
 
         return output
@@ -97,7 +114,7 @@ class Cluster:
     """
 
     def test(self):
-        assert (sum(self.getSizes())-1) <= 0.0000001
+        assert (sum(self.getSizes())-self.Nparticles) <= 0.0000001
 
     def weightedMean(self):
         arr = self.sizes ** 2

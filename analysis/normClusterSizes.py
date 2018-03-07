@@ -1,6 +1,7 @@
 import sys
 import pickle
 import numpy as np
+from copy import deepcopy
 
 from bilayer_clusters import trajIO, iter_cluster
 
@@ -26,8 +27,9 @@ if __name__ == '__main__':
         #cluster[nblock][time][layer][type][cluster_size]
 
     #parameters
+    del com_chol
     cluster_sizes = [3,4]
-    times = list(range(1,45))
+    times = list(range(1,46))
 
     #initialize output dict
     normSizes = {}
@@ -41,22 +43,28 @@ if __name__ == '__main__':
                 for size in cluster_sizes:
                     normSizes[block][t][layer][size] = [0 for i in range(size)]
 
-    weightedNormSizes = normSizes.copy()
+    weightedNormSizes = deepcopy(normSizes)
 
     for block in range(Nblock):
         start = block*nlog
         for time in times:
             t = start + time
+            print(t) #progress tracker
 
             for layer in ['upper','lower']:
                 for size in cluster_sizes:
                     for i in range(size):
                         #group = len(clusters[block][time]['lipids'][layer][size][i])
                         c = iter_cluster.Cluster(clusters[block][time]['lipids'][layer][size][i],L[t],cutoff)
-                        
                         normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = c.normalize(com_lipids[t])
 
     output = "normClust.dict"
     output2 = "weightedClust.dict"
-    pickle.dump(normSizes, open(output, "wb" ) )
-    pickle.dump(weightedNormSizes, open(output2, "wb" ) )
+
+    f = open(output, "wb" )
+    pickle.dump(normSizes, f)
+    f.close()
+
+    f = open(output2, "wb" )
+    pickle.dump(weightedNormSizes, f)
+    f.close()
