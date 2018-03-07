@@ -7,8 +7,8 @@ from bilayer_clusters import trajIO, iter_cluster
 if __name__ == '__main__':
     
     trajFileName = sys.argv[1]
-    Nconf = 4600
-    nlog = 46
+    Nconf = int(sys.argv[2])
+    nlog = int(sys.argv[3])
     Nblock = Nconf//nlog
     cutoff = 1.15 #anything above 20chol #maybe 1.3 for everything below?
 
@@ -26,8 +26,8 @@ if __name__ == '__main__':
         #cluster[nblock][time][layer][type][cluster_size]
 
     #parameters
-    cluster_sizes = [3,4,5,6,7,8]
-    times = list(range(29,38))
+    cluster_sizes = [3,4]
+    times = list(range(1,45))
 
     #initialize output dict
     normSizes = {}
@@ -35,29 +35,28 @@ if __name__ == '__main__':
         normSizes[block] = {}
         for t in times:
             normSizes[block][t] = {}
-            for particle in ['lipids','chol']:
-                normSizes[block][t][particle] = {}
-                for layer in ['upper','lower']:
-                    normSizes[block][t][particle][layer] = {}
-                    for size in cluster_sizes:
-                        normSizes[block][t][particle][layer][size] = [0 for i in range(size)]
+        
+            for layer in ['upper','lower']:
+                normSizes[block][t][layer] = {}
+                for size in cluster_sizes:
+                    normSizes[block][t][layer][size] = [0 for i in range(size)]
 
     weightedNormSizes = normSizes.copy()
 
     for block in range(Nblock):
+        start = block*nlog
         for time in times:
-            t = block*nlog + time
+            t = start + time
 
             for layer in ['upper','lower']:
                 for size in cluster_sizes:
                     for i in range(size):
-                        group = len(clusters[block][time]['lipids'][layer][size][i])
+                        #group = len(clusters[block][time]['lipids'][layer][size][i])
                         c = iter_cluster.Cluster(clusters[block][time]['lipids'][layer][size][i],L[t],cutoff)
                         
-                        normSizes[block][time]['lipids'][layer][size][i],weightedNormSizes[block][time]['lipids'][layer][size][i] = c.normalize(com_lipids[t])
-
+                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = c.normalize(com_lipids[t])
 
     output = "normClust.dict"
     output2 = "weightedClust.dict"
     pickle.dump(normSizes, open(output, "wb" ) )
-    pickle.dump(weightedNormSizes, open(output, "wb" ) )
+    pickle.dump(weightedNormSizes, open(output2, "wb" ) )

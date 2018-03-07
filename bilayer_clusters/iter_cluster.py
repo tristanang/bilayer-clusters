@@ -24,8 +24,9 @@ def display(cluster):
 
 class Cluster:
     def __init__(self,arr,L,cutoff):
+        self.L = L
         self.cutoff = cutoff
-        self.arr = arr
+        #self.arr = arr
         self.Nparticles = len(arr)
         edm = euclideanDist.edm(L,arr)
         #edm = euclidean_distances(arr,arr,'euclidean')
@@ -44,7 +45,8 @@ class Cluster:
                 del self.clusters[index]
 
         self.sizes = self.getSizes()
-          
+
+    """   
     def singletonMerge(self):
         singletons = list(filter(lambda x : len(x) == 1,self.clusters))
         self.clusters = list(filter(lambda x : len(x) != 1,self.clusters))
@@ -53,21 +55,20 @@ class Cluster:
             merge = reduce(lambda x,y : x | y,singletons)
             self.clusters.append(merge)
         return
+    """
 
     def getCenter(self):
         return
 
-    def normalize(self,original,iterations=10):
-        sizes = self.getSizes()
+    def normalize(self,original,trials=5):
 
-        trials = iterations
         m = np.zeros(trials)
         mS = np.zeros(trials)
 
         for i in range(trials):
             random_clust = randomCluster(self.Nparticles,original)
             c = Cluster(random_clust,self.L,self.cutoff)
-            sizes = c.getSizes()
+            sizes = c.sizes
             
             m[i] = np.mean(sizes)
 
@@ -83,6 +84,7 @@ class Cluster:
 
         return output
 
+    """
     def hidden_f(self,sett):
         output = []
         for i in sett:
@@ -92,6 +94,7 @@ class Cluster:
 
     def spitXY(self): ##
         return list(map(self.hidden_f,self.clusters))
+    """
 
     def test(self):
         assert (sum(self.getSizes())-1) <= 0.0000001
