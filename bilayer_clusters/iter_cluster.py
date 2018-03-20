@@ -3,11 +3,6 @@ from bilayer_clusters import euclideanDist
 from functools import reduce
 import matplotlib.pyplot as plt
 
-import multiprocessing
-pool = multiprocessing.Pool()
-
-#from scipy.spatial.distance import cdist as euclidean_distances
-
 def findCluster(clusters,item):
     Nclusters = len(clusters)
 
@@ -72,10 +67,10 @@ class Cluster:
         temp = [0 for i in range(trials)]
         temp = list(map(hidden_r, temp))
 
-        m = pool.map(np.mean,temp)
+        m = list(map(np.mean,temp))
 
-        temp = pool.map(np.square,temp)
-        mS = pool.map(np.mean,temp)
+        temp = list(map(np.square,temp))
+        mS = list(map(np.mean,temp))
 
         """
         #parallelize
