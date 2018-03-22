@@ -3,7 +3,8 @@ import pickle
 import numpy as np
 from copy import deepcopy
 
-from bilayer_clusters import trajIO, iter_cluster
+from bilayer_clusters import trajIO
+from bilayer_clusters import density_cluster as dc
 
 if __name__ == '__main__':
     
@@ -16,10 +17,12 @@ if __name__ == '__main__':
     if trajIO.rawOrCOM(trajFileName):
         Nchol = trajIO.cholConc(topology)
         N,L,com_lipids,com_chol = trajIO.processTrajCOM(trajFileName,Nchol,c.NDIM,Nconf)
+        com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
 
         Nlipids = com_lipids.shape[0]
     else:
         L,com_lipids,com_chol = trajIO.decompress(trajFileName)
+        com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
     
     if True:
         pickle_off = open("clusters.dict","rb")
@@ -29,7 +32,7 @@ if __name__ == '__main__':
     #parameters
     del com_chol
     cluster_sizes = [3,4]
-    times = list(range(1,46))
+    times = list(range(1,2))
 
     #initialize output dict
     normSizes = {}
@@ -50,13 +53,17 @@ if __name__ == '__main__':
         for time in times:
             t = start + time
             print(t) #progress tracker
+            upper,lower = trajIO.layering(com_lipids[t])
+            original = {}
+            original['upper'] = upper
+            original['lower'] = lower
+            #print(len(upper),len(lower))
 
             for layer in ['upper','lower']:
                 for size in cluster_sizes:
                     for i in range(size):
                         #group = len(clusters[block][time]['lipids'][layer][size][i])
-                        c = iter_cluster.Cluster(clusters[block][time]['lipids'][layer][size][i],L[t],cutoff)
-                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = c.normalize(com_lipids[t])
+                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = dc.normSize(clusters[block][time]['lipids'][layer][size][i],L[t],cutoff,original[layer])
 
     output = "normClust.dict"
     output2 = "weightedClust.dict"
