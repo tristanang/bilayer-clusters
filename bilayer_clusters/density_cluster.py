@@ -6,6 +6,7 @@ import numpy as np
 from bilayer_clusters import euclideanDist 
 
 def dbscan_wrapper(start,arr,L,cutoff):
+
     lipids = start[arr]
     edm = euclideanDist.edm(L,lipids)
     db = DBSCAN(eps=cutoff, min_samples=2, metric='precomputed', n_jobs=-1)
@@ -68,7 +69,7 @@ def normSize(start,arr,L,cutoff,alg=dbscan_wrapper):
     #denominator
     size = len(arr)
     dmean,dmS = meanRandom(start,L,cutoff,size)
-    print(dmean,dmS)
+    #print(nmean/dmean,nmS/dmS)
 
     return (nmean/dmean,nmS/dmS)
 

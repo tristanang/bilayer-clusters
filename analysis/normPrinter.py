@@ -10,7 +10,7 @@ normSizes = pickle.load(pickle_off1)
 weightedSizes = pickle.load(pickle_off2)
 
 cluster_sizes = [3,4]
-times = list(range(1,2))
+times = list(range(1,46))
 
 Nconf = int(sys.argv[1])
 nlog = int(sys.argv[2])

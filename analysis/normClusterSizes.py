@@ -33,7 +33,7 @@ if __name__ == '__main__':
     #parameters
     del com_chol
     cluster_sizes = [3,4]
-    times = list(range(1,2))
+    times = list(range(1,46))
 
     #initialize output dict
     normSizes = {}
@@ -55,6 +55,7 @@ if __name__ == '__main__':
         original = {}
         original['upper'] = upper
         original['lower'] = lower
+        print(len(upper),len(lower))
         for time in times:
             t = start + time
             print(t) #progress tracker
