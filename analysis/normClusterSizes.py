@@ -17,12 +17,13 @@ if __name__ == '__main__':
     if trajIO.rawOrCOM(trajFileName):
         Nchol = trajIO.cholConc(topology)
         N,L,com_lipids,com_chol = trajIO.processTrajCOM(trajFileName,Nchol,c.NDIM,Nconf)
-        com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
+        
 
         Nlipids = com_lipids.shape[0]
     else:
         L,com_lipids,com_chol = trajIO.decompress(trajFileName)
-        com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
+        
+    com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
     
     if True:
         pickle_off = open("clusters.dict","rb")
@@ -50,20 +51,19 @@ if __name__ == '__main__':
 
     for block in range(Nblock):
         start = block*nlog
+        upper, lower = trajIO.layering(com_lipids[start])
+        original = {}
+        original['upper'] = upper
+        original['lower'] = lower
         for time in times:
             t = start + time
             print(t) #progress tracker
-            upper,lower = trajIO.layering(com_lipids[t])
-            original = {}
-            original['upper'] = upper
-            original['lower'] = lower
-            #print(len(upper),len(lower))
-
+            
             for layer in ['upper','lower']:
                 for size in cluster_sizes:
                     for i in range(size):
-                        #group = len(clusters[block][time]['lipids'][layer][size][i])
-                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = dc.normSize(clusters[block][time]['lipids'][layer][size][i],L[t],cutoff,original[layer])
+                        index = clusters[block][time]['lipids'][layer][size][i]
+                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = dc.normSize(original[layer],index,L[t],cutoff)
 
     output = "normClust.dict"
     output2 = "weightedClust.dict"

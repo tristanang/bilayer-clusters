@@ -5,8 +5,9 @@ import numpy as np
 
 from bilayer_clusters import euclideanDist 
 
-def dbscan_wrapper(arr,L,cutoff):
-    edm = euclideanDist.edm(L,arr)
+def dbscan_wrapper(start,arr,L,cutoff):
+    lipids = start[arr]
+    edm = euclideanDist.edm(L,lipids)
     db = DBSCAN(eps=cutoff, min_samples=2, metric='precomputed', n_jobs=-1)
     #db.fit(edm)
     #labels = db.labels_
@@ -41,8 +42,8 @@ def means(hsh):
 
     return mean,mS
 
-def mean_cluster_size(arr,L,cutoff,alg=dbscan_wrapper):
-    labels = alg(arr,L,cutoff)
+def mean_cluster_size(start,arr,L,cutoff,alg=dbscan_wrapper):
+    labels = alg(start,arr,L,cutoff)
     hsh = cluster_sizes(labels)
     return means(hsh)
 
@@ -51,7 +52,7 @@ def meanRandom(originalArr,L,cutoff,size,iter=10 ,alg=dbscan_wrapper):
 
     for i in range(iter):
         cluster = randomCluster(size,originalArr)
-        lst.append(mean_cluster_size(cluster,L,cutoff))
+        lst.append(mean_cluster_size(originalArr,cluster,L,cutoff))
 
     lst=list(zip(*lst))
 
@@ -60,13 +61,13 @@ def meanRandom(originalArr,L,cutoff,size,iter=10 ,alg=dbscan_wrapper):
 
     return mean,mS
 
-def normSize(arr,L,cutoff,originalArr,alg=dbscan_wrapper):
+def normSize(start,arr,L,cutoff,alg=dbscan_wrapper):
     #numerator
-    nmean,nmS = mean_cluster_size(arr,L,cutoff)
+    nmean,nmS = mean_cluster_size(start,arr,L,cutoff)
     #print(nmean,nmS)
     #denominator
     size = len(arr)
-    dmean,dmS = meanRandom(originalArr,L,cutoff,size)
+    dmean,dmS = meanRandom(start,L,cutoff,size)
     print(dmean,dmS)
 
     return (nmean/dmean,nmS/dmS)
@@ -75,6 +76,4 @@ def randomCluster(siz,arr):
     Nparticles = len(arr)
     idx = np.random.randint(Nparticles, size=siz)
 
-    cluster = arr[idx,:]
-
-    return cluster
+    return idx

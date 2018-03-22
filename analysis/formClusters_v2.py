@@ -37,8 +37,8 @@ if __name__ == "__main__":
     #calculating displacement
 
     com_lipids = displacement.block_displacement(L,com_lipids)
-    if Nchol: com_chol = displacement.block_displacement(L,com_chol)
-    else: del com_chol
+    #if Nchol: com_chol = displacement.block_displacement(L,com_chol)
+    #else: del com_chol
     
     #cluster dict
     clusters = {} #cluster[nblock][time][type][layer][cluster_size]
@@ -47,28 +47,29 @@ if __name__ == "__main__":
         for t in times:
             clusters[block][t] = {}
             clusters[block][t]['lipids'] = {}
-            if Nchol: clusters[block][t]['chol'] = {}
+            #if Nchol: clusters[block][t]['chol'] = {}
             for layer in ['upper','lower']:
                 clusters[block][t]['lipids'][layer] = {}
-                if Nchol: clusters[block][t]['chol'][layer] = {}
+                #if Nchol: clusters[block][t]['chol'][layer] = {}
 
     #running
 
     for block in range(Nblock):
         for time in times:
+            t = block*nlog + time
+            upper_lipids, lower_lipids = trajIO.layering(com_lipids[t])
+
             for size in cluster_sizes:
-                t = block*nlog + time
-
-                upper_lipids, lower_lipids = trajIO.layering(com_lipids[t])
-
                 clusters[block][time]['lipids']['upper'][size] = jenks_clusters.clusters(upper_lipids,size)
                 clusters[block][time]['lipids']['lower'][size] = jenks_clusters.clusters(lower_lipids,size)
                 
+                """
                 if Nchol:
                     upper_chol, lower_chol = trajIO.layering(com_chol[t])
 
                     clusters[block][time]['chol']['upper'][size] = jenks_clusters.clusters(upper_chol,size)
                     clusters[block][time]['chol']['lower'][size] = jenks_clusters.clusters(lower_chol,size)
+                """
                 
     output = "clusters.dict"
 
