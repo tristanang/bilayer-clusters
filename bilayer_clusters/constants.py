@@ -32,6 +32,6 @@ percentages['all']['higher'][4] = [0.3284108261787262,0.36312795461132935,0.2325
 percentages['all']['lower'][4] = [0.2951049154467215,0.35187926710846185,0.2545816896284728,0.0984341278163439]
 
 cutoff = {}
-cutoff['lower'] = [1.15,1.15,1.15] #dppc,chol,cross 1.3
-cutoff['upper'] = [1.15,1.15,1.15] #dppc,chol,cross
+cutoff['lower'] = [1.3,1.15,1.15] #dppc,chol,cross 1.3
+cutoff['upper'] = [1.15,0.83,1.0] #dppc,chol,cross
 

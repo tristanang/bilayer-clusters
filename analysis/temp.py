@@ -32,7 +32,7 @@ if __name__ == "__main__":
     com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol)
 
     #parameters
-    cluster_sizes = [3,4]
+    cluster_sizes = [2,5]
     times = list(range(1,46))
 
     #calculating displacement
@@ -114,7 +114,7 @@ if __name__ == "__main__":
                     clusters[block][time]['chol']['upper'][size] = jenks_clusters.clusters(upper_chol,size)
                     clusters[block][time]['chol']['lower'][size] = jenks_clusters.clusters(lower_chol,size) 
             
-    output = "clusters.dict"
+    output = "clusters15.dict"
     f = open(output, "wb")
 
     pickle.dump(clusters, f)

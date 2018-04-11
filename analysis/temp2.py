@@ -24,22 +24,26 @@ if __name__ == "__main__":
     else:
         L,com_lipids,com_chol = trajIO.decompress(trajFileName)
         Nchol = com_chol.shape[1]
-        Nchol = 0
 
     Nlipids = com_lipids.shape[1]
     Nblock = Nconf//nlog
     
     com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol)
+    print(com_lipids.shape,com_chol.shape)
+
+    if Nchol: com_lipids = np.concatenate((com_lipids,com_chol),axis=1)
+    print(com_lipids.shape)
 
     #parameters
-    cluster_sizes = [3,4]
+    cluster_sizes = [2,5]
     times = list(range(1,46))
 
     #calculating displacement
 
     com_lipids = displacement.block_displacement(L,com_lipids)
-    if Nchol: com_chol = displacement.block_displacement(L,com_chol)
-    else: del com_chol
+
+    del com_chol
+    Nchol = 0
     
     #cluster dict
     clusters = {} #cluster[nblock][time][type][layer][cluster_size]
@@ -114,12 +118,11 @@ if __name__ == "__main__":
                     clusters[block][time]['chol']['upper'][size] = jenks_clusters.clusters(upper_chol,size)
                     clusters[block][time]['chol']['lower'][size] = jenks_clusters.clusters(lower_chol,size) 
             
-    output = "clusters.dict"
+    output = "clusters15.dict"
     f = open(output, "wb")
 
     pickle.dump(clusters, f)
     f.close()
-
 
 
 

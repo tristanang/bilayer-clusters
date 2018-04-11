@@ -24,12 +24,15 @@ if __name__ == "__main__":
     else:
         L,com_lipids,com_chol = trajIO.decompress(trajFileName)
         Nchol = com_chol.shape[1]
-        Nchol = 0
 
     Nlipids = com_lipids.shape[1]
     Nblock = Nconf//nlog
     
     com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol)
+    print(com_lipids.shape,com_chol.shape)
+
+    if Nchol: com_lipids = np.concatenate((com_lipids,com_chol),axis=1)
+    print(com_lipids.shape)
 
     #parameters
     cluster_sizes = [3,4]
@@ -38,8 +41,9 @@ if __name__ == "__main__":
     #calculating displacement
 
     com_lipids = displacement.block_displacement(L,com_lipids)
-    if Nchol: com_chol = displacement.block_displacement(L,com_chol)
-    else: del com_chol
+
+    del com_chol
+    Nchol = 0
     
     #cluster dict
     clusters = {} #cluster[nblock][time][type][layer][cluster_size]

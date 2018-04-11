@@ -3,13 +3,15 @@ import numpy as np
 from copy import deepcopy
 import sys   
 
+from bilayer_clusters import constants as c
+
 pickle_off1 = open("normClust.dict","rb")
 pickle_off2 = open("weightedClust.dict","rb")
 
 normSizes = pickle.load(pickle_off1)
 weightedSizes = pickle.load(pickle_off2)
 
-cluster_sizes = [3,4]
+cluster_sizes = c.cluster_sizes
 times = list(range(1,46))
 
 Nconf = int(sys.argv[1])
