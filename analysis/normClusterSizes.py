@@ -32,7 +32,7 @@ if __name__ == '__main__':
     #parameters
     del com_chol
     cluster_sizes = [3,4]
-    times = list(range(1,2))
+    times = list(range(1,46))
 
     #initialize output dict
     normSizes = {}

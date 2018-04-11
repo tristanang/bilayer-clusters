@@ -31,7 +31,7 @@ if __name__ == "__main__":
     com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol)
 
     #parameters
-    cluster_sizes = [3,4]
+    cluster_sizes = [2]
     times = list(range(1,46))
 
     #calculating displacement
@@ -55,10 +55,13 @@ if __name__ == "__main__":
     #running
 
     for block in range(Nblock):
-        for time in times:
-            for size in cluster_sizes:
-                t = block*nlog + time
+        start = block*nlog
 
+        for time in times:
+            t = start + time
+
+            for size in cluster_sizes:
+                
                 upper_lipids, lower_lipids = trajIO.layering(com_lipids[t])
 
                 clusters[block][time]['lipids']['upper'][size] = jenks_clusters.clusters(upper_lipids,size)
@@ -69,7 +72,11 @@ if __name__ == "__main__":
 
                     clusters[block][time]['chol']['upper'][size] = jenks_clusters.clusters(upper_chol,size)
                     clusters[block][time]['chol']['lower'][size] = jenks_clusters.clusters(lower_chol,size)
-                
+    
+    for block in range(Nblock):
+        while t<Nconf
+
+
     output = "clusters.dict"
 
     pickle.dump(clusters, open(output, "wb" ) )

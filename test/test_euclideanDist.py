@@ -6,6 +6,16 @@ from bilayer_clusters.euclideanDist import *
 
 import numpy as np
 import random
+
+def time_function(f, *args):
+  """
+  Call a function f with args and return the time (in seconds) that it took to execute.
+  """
+  import time
+  tic = time.time()
+  f(*args)
+  toc = time.time()
+  return toc - tic
 """
 def test_no_z_dist():
     p1 = np.random.rand(3)
@@ -26,18 +36,26 @@ def test_no_z_dist():
         return False
 """
 def test_2vs0_loop():
-    N = 23
-    N2 = 43
-    NDIM = 3
-    L = [1,1,1]
+    L,com_lipids,com_chol = trajIO.decompress("comTraj.npz")
 
-    p1 = np.random.rand(N,NDIM)
-    p2 = np.random.rand(N2,NDIM)
 
-    dist1 = edm_two_loop(L,p1,p2)
-    dist2 = edm(L,p1,p2)
+
+    dist1 = edm_two_loop(L[34],com_lipids[34])
+    dist2 = edm(L[34],com_lipids[34])
+
+    print(dist1[80][45],dist2[80][45])
 
     sum = 0.0
+
+    two_loop = 0
+    for i in range(5):
+        two_loop += time_function(edm_two_loop,L[34],com_lipids[34])
+    print('two loop version took %f seconds' % two_loop)
+
+    one_loop = 0
+    for i in range(5):
+        one_loop += time_function(edm,L[34],com_lipids[34])
+    print('one loop version took %f seconds' % one_loop)
 
     for t in range(1):
         difference = np.linalg.norm(dist1 - dist2, ord='fro')
@@ -52,3 +70,4 @@ def test_2vs0_loop():
 
 if __name__ == "__main__":
     test_2vs0_loop()
+

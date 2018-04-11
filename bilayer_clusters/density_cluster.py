@@ -2,6 +2,7 @@ from sklearn.cluster import DBSCAN
 from scipy.cluster import hierarchy
 
 import numpy as np
+import random
 
 from bilayer_clusters import euclideanDist 
 
@@ -57,7 +58,7 @@ def meanRandom(originalArr,L,cutoff,size,iter=10 ,alg=dbscan_wrapper):
 
     mean=sum(lst[0])/iter
     mS=sum(lst[1])/iter
-
+    
     return mean,mS
 
 def normSize(arr,L,cutoff,originalArr,alg=dbscan_wrapper):
@@ -67,14 +68,21 @@ def normSize(arr,L,cutoff,originalArr,alg=dbscan_wrapper):
     #denominator
     size = len(arr)
     dmean,dmS = meanRandom(originalArr,L,cutoff,size)
-    print(dmean,dmS)
 
     return (nmean/dmean,nmS/dmS)
 
+
+
+
 def randomCluster(siz,arr):
     Nparticles = len(arr)
-    idx = np.random.randint(Nparticles, size=siz)
+    idx = np.asarray(random.sample(list(range(Nparticles)),siz))
 
     cluster = arr[idx,:]
 
     return cluster
+
+
+
+
+
