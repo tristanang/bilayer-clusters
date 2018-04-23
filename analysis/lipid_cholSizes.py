@@ -8,10 +8,9 @@ import pickle
 
 def sizet(thing,size,arr):
     colors = ['b', 'c', 'y', 'm', 'r','k','b','c']
-    #times = [28,29,30,31,32,33,34,35,36,37]
-    times = [10,11,12,13,14,15,16,17,18,19]
+    times = [29,30,31,32,33,34,35,36,37]
     
-    lst = []
+    lst []
 
     for i in range(size):
         y = []
@@ -20,12 +19,13 @@ def sizet(thing,size,arr):
             y.append(np.mean(arr[thing][time][size][i]))
         
         y = np.asarray(y)
-        print(np.mean(y))
+        lst.append(np.mean(y))
 
+    return lst
     
 if __name__ == '__main__':
     import sys
-    sys.stdout = open('sizes-lipid-lower.txt','wt')
+    sys.stdout = open('sizes.txt','wt')
         
     Nblock = 100
 
@@ -36,8 +36,7 @@ if __name__ == '__main__':
     clusters = pickle.load(pickle_off1)
     clusters15 = pickle.load(pickle_off2)
 
-    #times = [28,29,30,31,32,33,34,35,36,37]
-    times = [10,11,12,13,14,15,16,17,18,19]
+    times = [29,30,31,32,33,34,35,36,37]
 
     c_size = {}
     c_size['lipids'] = {}

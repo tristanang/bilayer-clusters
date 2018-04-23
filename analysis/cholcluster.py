@@ -7,7 +7,7 @@ from bilayer_clusters import trajIO
 from bilayer_clusters import displacement
 from bilayer_clusters import constants as c
 from bilayer_clusters import percentages
-from bilayer_clusters import iter_cluster as iter
+from bilayer_clusters import density_cluster as dc
 
 def printer(normSizes,weightedSizes,logNorm,logWeighted,Nconf,times,nlog=c.nlog):
 
@@ -62,7 +62,7 @@ def printer(normSizes,weightedSizes,logNorm,logWeighted,Nconf,times,nlog=c.nlog)
     for kind in ['norm','weighted']:
         for size in cluster_sizes:
             for i in range(size):
-                filename = 'all'+kind+'Size'+'_'+str(size)+'_'+str(i)+".dat"
+                filename = 'chol'+kind+'Size'+'_'+str(size)+'_'+str(i)+".dat"
                 f = open(filename,'w')
                 for time,data in zip(c.realtimes[:len(printing[kind][size][i])],printing[kind][size][i]):
                     f.write(fmt %(time,data))
@@ -75,25 +75,25 @@ if __name__ == '__main__':
     Nconf = int(sys.argv[2])
     nlog = int(sys.argv[3])
     Nblock = Nconf//nlog
-    flag = 'upper' 
+    cutoff = 0.83 #anything above 20chol #maybe 1.3 for everything below?
 
     if trajIO.rawOrCOM(trajFileName):
         Nchol = trajIO.cholConc(topology)
         N,L,com_lipids,com_chol = trajIO.processTrajCOM(trajFileName,Nchol,c.NDIM,Nconf)
         com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
 
-        Nlipids = com_lipids.shape[1]
+        Nlipids = com_lipids.shape[0]
     else:
         L,com_lipids,com_chol = trajIO.decompress(trajFileName)
         com_lipids,com_chol = trajIO.translateZ(com_lipids,com_chol) 
-        Nchol = com_lipids.shape[1]
 
     #parameters
+    com_lipids = com_chol
+    del com_chol
     cluster_sizes = [4]
     times = list(range(1,46))
 
     com_lipids = displacement.block_displacement(L,com_lipids)
-    com_chol = displacement.block_displacement(L,com_chol)
 
     #initialize output dict
     normSizes = {}
@@ -141,17 +141,11 @@ if __name__ == '__main__':
         start = block*nlog
         for time in times:
             t = start + time
-            print(t) #progress tracker
-            ul,ll = trajIO.layering(com_lipids[t])
-            uc,lc = trajIO.layering(com_chol[t])
-
+            #print(t) #progress tracker
+            upper,lower = trajIO.layering(com_lipids[t])
             original = {}
-            original['upper'] = iter.combine(ul,uc)
-            original['lower'] = iter.combine(ll,lc)
-
-            random = {}
-            random['upper'] = (ul,uc)
-            random['lower'] = (ll,lc)
+            original['upper'] = upper
+            original['lower'] = lower
 
             for layer in ['upper','lower']:
                 #clustering
@@ -159,11 +153,11 @@ if __name__ == '__main__':
 
                 for size in cluster_sizes:
                     for i in range(size):
-                        nlipids,nchol = iter_cluster.counter(cluster[i])
-                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = iter.mean_cluster_size(clusters[i],L[t],flag)
+                        Nparticles = len(clusters[i])
+                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = dc.mean_cluster_size(clusters[i],L[t],cutoff)
                         
                         if time == 1:
-                            alpha,beta = iter.meanRandom(original[layer],L[t],Nparticles,flag)
+                            alpha,beta = dc.meanRandom(original[layer],L[t],cutoff,Nparticles)
                             logNorm[size][i] += alpha
                             logWeighted[size][i] += beta
 
@@ -175,20 +169,15 @@ if __name__ == '__main__':
         linear_t = displacement.linear_gen(start,Nconf)
 
         com_lipids = displacement.linear_displacement(L,com_lipids,start,Nconf)
-        com_chol = displacement.linear_displacement(L,com_chol,start,Nconf)
         
         for time in linear_t:
-            print(start,time)
+            #print(start,time)
             t = start + time
 
-            ul,ll = trajIO.layering(com_lipids[t])
-            uc,lc = trajIO.layering(com_chol[t])
-
+            upper,lower = trajIO.layering(com_lipids[t])
             original = {}
-            original['upper'] = iter.combine(ul,uc)
-            original['lower'] = iter.combine(ll,lc)
-
-
+            original['upper'] = upper
+            original['lower'] = lower
 
             for layer in ['upper','lower']:
                 #clustering
@@ -197,7 +186,7 @@ if __name__ == '__main__':
                 for size in cluster_sizes:
                     for i in range(size):
                         Nparticles = len(clusters[i])
-                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = iter.mean_cluster_size(clusters[i],L[t],flag)
+                        normSizes[block][time][layer][size][i],weightedNormSizes[block][time][layer][size][i] = dc.mean_cluster_size(clusters[i],L[t],cutoff)
                         
     for size in cluster_sizes:
         logNorm[size] /= (Nblock*2)
@@ -211,8 +200,8 @@ if __name__ == '__main__':
 
 
 
-    output = "allNormClust.dict"
-    output2 = "allWeightedClust.dict"
+    output = "cholnormClust.dict"
+    output2 = "cholweightedClust.dict"
 
     f = open(output, "wb" )
     pickle.dump(normSizes, f)

@@ -100,7 +100,14 @@ def set_neighbors(i,neighbors):
 
 cluster_sizes = dc.cluster_sizes
 means = dc.means
-randomCluster = dc.randomCluster
+
+def randomCluster(Nlipids,Nchol,lipids,chol):
+    Nparticles = len(arr)
+    idx = np.asarray(random.sample(list(range(Nparticles)),siz))
+
+    cluster = arr[idx,:]
+
+    return cluster
 
 def mean_cluster_size(total,L,flag='upper'):
     labels = cluster_labels(flag,L,total)
@@ -129,5 +136,8 @@ def normSize(total,L,originalArr,flag='upper',iter=10,):
     dmean,dmS = meanRandom(originalArr,L,size,flag,iter)
 
     return (nmean/dmean,nmS/dmS)
+
+#def counter(cluster):
+    
 
 
